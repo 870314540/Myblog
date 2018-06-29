@@ -9,10 +9,14 @@ curl命令是一个利用URL规则在命令行下工作的文件传输工具。�
 
 
 ###2命令及示例：太强大，用到什么学什么
+
 【语法】 
     curl [options] [URL...] 
 
 - curl -d  “value=value”  url  :  post 请求
+
+[curl](https://www.cnblogs.com/gbyukg/p/3326825.html)
+ 
 
 -d/--data <data>    为 POST 数据包指定要向 HTTP 服务器发送的数据并发送出去。这个过程和在浏览器中点击“submit”按钮是一样的，且数据将以 `content-type application/x-www-form-urlencoded `的方式被编码。 
 
@@ -28,10 +32,13 @@ curl -d "jdbId=11111"  http://localhost:8080/log
 返回：
 {"error":{"returnCode":1,"returnMessage":"startTime  is null","returnUserMessage":"startTime  is null"},"data":null,"logId":"03535170960027"}
 
-```
 
+curl -d "endTime=2017-12-28 12:32:42&jdbId=657991218449805656&startTime=2017-12-25 12:32:42"  http://localhost:8080//dhlog/dataAgent/lbs/getUserLbsList
 
+#断点续传
+curl -C - -O http://www.gnu.org/software/gettext/manual/gettext.html
 
+``` 
 
 
 ###3问题整理

@@ -56,7 +56,28 @@ no changes added to commit (use "git add" and/or "git commit -a")
 `git add --all ` 提交所有文件 
 
  
-- 
+- git commit :提交已暂存的文件 
+
+
+
+- git push 
+
+`git push -u origin master `:push 到远程仓库 master分支
+
+```
+Counting objects: 7, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 2.93 KiB | 2.93 MiB/s, done.
+Total 7 (delta 3), reused 0 (delta 0)
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To github.com:…………………….git
+   e573f67..b106583  master -> master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+```
+
+
+
 
 
 
