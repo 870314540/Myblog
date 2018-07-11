@@ -45,4 +45,20 @@ curl -C - -O http://www.gnu.org/software/gettext/manual/gettext.html
 
 
 
+###4示例学习
+
+`curl -XPUT 'http://localhost:9200/twitter/doc/1?pretty' -H 'Content-Type: application/json' -d '`
+
+`curl -XGET 'http://localhost:9200/twitter/doc/1?pretty=true'`
+
+`curl -XGET 'http://localhost:9200/twitter/_search?q=user:kimchy&pretty=true'`
+
+> pretty参数,和以前一样,仅仅是告诉Elasticsearch返回美观的JSON结果
+
+`curl -XGET 'http://localhost:9200/twitter/_search?pretty=true' -H 'Content-Type: application/json' -d '
+{
+    "query" : {
+        "match" : { "user": "kimchy" }
+    }
+}'`
 
