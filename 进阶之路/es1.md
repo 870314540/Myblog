@@ -20,7 +20,8 @@ Elastic Search是一个实时的高可用的分布式全文搜索和分析引擎
 
 	Relational DB -> Databases -> Tables -> Rows      -> Columns
 	Elasticsearch -> Indices   -> Types  -> Documents -> Fields
-
+	
+	
 ###基本概念
 
 - 接近实时搜索 NRT 
@@ -104,9 +105,22 @@ put /index/_settings 动态调整副本分片数目
 
 当发送请求的时候， 为了扩展负载，更好的做法是轮询集群中所有的节点。
 
-协调节点
+一致性保证：必须有合适的分片数目
 
-一致性保证
+规定数目 ：  (primary + number_of_replicas) / 2  + 1
+
+基于文档的复制：不会转发更新请求，转发完整的文档
+
+
+###document的crud原理
+
+1、客户端发送请求到任意一个node，成为coordinate node 
+2、coordinate node对document进行路由，将请求转发到对应的node，此时会使用**round-robin随机轮询算法**，在primary shard以及其所有replica中随机选择一个，让读请求负载均衡 
+3、接收请求的node返回document给coordinate node 
+4、coordinate node返回document给客户端 
+5、特殊情况：document如果还在建立索引过程中，可能只有primary shard有，任何一个replica shard都没有，此时可能会导致无法读取到document，但是document完成索引建立之后，primary shard和replica shard就都有了。
+
+
 
 
 
@@ -116,6 +130,15 @@ put /index/_settings 动态调整副本分片数目
 
 mapping的作用就是执行一系列的指令将输入的数据转成可搜索的索引项
 
+###全文检索
+
+全文检索，一般使用的是倒排索引的算法来实现的。 用到了Lucene
+
+
+
+
+
+
 
 
 
@@ -124,6 +147,46 @@ mapping的作用就是执行一系列的指令将输入的数据转成可搜索�
 倒排索引(Inverted Index)：倒排索引是实现“单词-文档矩阵”的一种具体存储形式，通过倒排索引，可以根据单词快速获取包含这个单词的文档列表。倒排索引主要由两个部分组成：“单词词典”和“倒排文件”。
 
 
+
+###主备机制
+
+ES存在主备机制，shard 和 replia机制
+
+```
+（1）index包含多个shard
+（2）每个shard都是一个最小工作单元，承载部分数据，lucene实例，完整的建立索引和处理请求的能力
+（3）增减节点时，shard会自动在nodes中负载均衡
+（4）primary shard和replica shard，每个document肯定只存在于某一个primary shard以及其对应的replica shard中，不可能存在于多个primary shard
+（5）replica shard是primary shard的副本，负责容错，以及承担读请求负载
+（6）primary shard的数量在创建索引的时候就固定了，replica shard的数量可以随时修改
+（7）primary shard的默认数量是5，replica默认是1，默认有10个shard，5个primary shard，5个replica shard
+（8）primary shard不能和自己的replica shard放在同一个节点上（否则节点宕机，primary shard和副本都丢失，起不到容错的作用），但是可以和其他primary shard的replica shard放在同一个节点上
+```
+
+###容错机制
+Elasticsearch容错机制：master选举，replica容错，数据恢复。
+
+一个例子 ：
+a、原来node1是一个master，假如因为某种原因node1宕机了，node中是R0，R1和R2全部丢失。
+b、进行master选举，自动选举另外一个node成为新的master，承担起master的责任来，例如现在全部选举了node2为master。
+c、新的master，将丢失的primary shard的某个replica shard提升为primary  shard。此时集群的状态就会变为yellow，原因是虽然目前所有的primary  shard全部变成active，但是replice shard少了，也就并不是所有的replica  shard都是active。
+d、重启故障的node1，新的master(node2)会将缺失的副本都copy一份到这个node1上面去，而且这个node1会使用之前已经有的shard数据，只是同步一下宕机之后发生的修改，此时，集群是status再次变回green。
+
+
+###es并发控制
+
+乐观锁：不加锁。一般是version对比后，进行操作；
+
+悲观锁：常见于关系型数据库。在各种情况下都上锁，就只有一个线程可以操作这条数据，不同的场景下，有行级锁、表级锁、读锁和写锁。
+
+悲观锁的优点：方便，对应用程序来说透明，缺点：并发能力低。 
+乐观锁：并发能力高，都需要重新比对版本号，然后可能需要重新加载数据，再写，这个过程，可能需要重复好几次。
+
+es后台都是多线程异步的，多个修改请求，是没有顺序的；
+
+es内部的多线程异步并发是基于自己的verison版本号进行乐观锁控制的
+
+es还提供了一个feature，就是说，你可以不用它提供的内部_version版本号来进行并发控制，可以基于你自己维护的一个版本号来进行并发控制。
 
 
 
@@ -165,3 +228,4 @@ JestClient 操作 es
 
 参考：
 [es 参考1](https://mp.weixin.qq.com/s/XEYsgYOcI7Wv0PZq4Sf-Hw)
+[es 参考2](https://blog.csdn.net/sdksdk0/article/details/78469190)

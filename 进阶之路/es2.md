@@ -85,7 +85,7 @@ curl -X<VERB>'<PROTOCOL>://<HOST>/<PATH>?<QUERY_STRING>' -d'<BODY>'
 
 • QUERY_STRING 一些可选的查询请求参数，例如 ?pretty 参数将使请求返回更加美观易读的JSON数据
 
-• BODY 一个JSON格式的请求主体（如果请求需要的话
+• BODY 一个JSON格式的请求主体（如果请求需要的话)
 
 
 ---
@@ -127,8 +127,22 @@ curl -XGET "http://localhost:9200/movies/movie/1"
 curl -XDELETE "http://localhost:9200/movies/movie/1"
 
 
+**update 是删除原先的，新增新的document**
 
-版本号(_version)可用于跟踪文档已编入索引的次数
+*版本号(_version)可用于跟踪文档已编入索引的次数*
+
+query sring search参数说明（在实际的生产环境中，几乎很少使用query string search）：
+```
+took：耗费了的时间（毫秒）
+timed_out：是否超时 
+_shards：数据拆成了5个分片，所以对于搜索请求，会打到所有的primary shard（或者是它的某个replica shard也可以）
+hits.total：查询结果的数量，3个document
+hits.max_score：score的含义，就是document对于一个search的相关度的匹配分数，越相关，就越匹配，分数也高
+hits.hits：包含了匹配搜索的document的详细数据
+
+```
+
+
 
 
 ###2 ElasticSearch具有和端点(_bulk)用于用单个请求索引多个文档
@@ -162,8 +176,13 @@ fields属性用来要搜索的字段数组：
     }
 
 
+### 索引操作
 
+查看有哪些索引：  `GET /_cat/indices?v`
 
+创建 索引 ： `PUT /test_index?pretty`
+
+可以设置自动创建索引
 
 
 
