@@ -133,12 +133,14 @@ curl -XDELETE "http://localhost:9200/movies/movie/1"
 
 query sring search参数说明（在实际的生产环境中，几乎很少使用query string search）：
 ```
-took：耗费了的时间（毫秒）
-timed_out：是否超时 
-_shards：数据拆成了5个分片，所以对于搜索请求，会打到所有的primary shard（或者是它的某个replica shard也可以）
-hits.total：查询结果的数量，3个document
-hits.max_score：score的含义，就是document对于一个search的相关度的匹配分数，越相关，就越匹配，分数也高
-hits.hits：包含了匹配搜索的document的详细数据
+took - Elasticsearch执行此次搜索所用的时间(单位：毫秒)
+timed_out - 告诉我们此次搜索是否超时
+_shards - 告诉我们搜索了多少分片，还有搜索成功和搜索失败的分片数量
+hits - 搜索结果
+hits.total - 符合搜索条件的文档数量
+hits.hits - 实际返回的搜索结果对象数组(默认只返回前10条)
+hits.sort - 返回结果的排序字段值(如果是按score进行排序，则没有)
+hits._score 和 max_score - 目前先忽略这两个字段
 
 ```
 
