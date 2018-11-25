@@ -10,3 +10,13 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+.DS_Store
+src/.DS_Store
+src/main/.DS_Store
+src/main/webapp/.DS_Store
+src/main/webapp/WEB-INF/.DS_Store
+src/main/webapp/resources/.DS_Store
+webapp/.DS_Store
+webapp/WEB-INF/.DS_Store
+webapp/resources/.DS_Store
